@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-repo_url="${GROC_REPO_URL:-https://github.com/matrixtsex/groc.git}"
+repo_url="${GROC_REPO_URL:-https://github.com/CoinAnole/groc.git}"
 source_dir="${GROC_INSTALL_SOURCE:-$HOME/.local/share/groc-src}"
 
 if ! command -v git >/dev/null 2>&1; then
