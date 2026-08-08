@@ -370,7 +370,7 @@ class GrocApp:
             missing.append("curl")
         if not command_exists("git"):
             missing.append("git")
-        if not Path(self.settings.grok_bin).is_file():
+        if not command_exists(self.settings.grok_bin):
             missing.append("grok")
         if not command_exists(self.settings.codex_bin):
             missing.append("codex")
@@ -411,7 +411,7 @@ class GrocApp:
         yield CheckResult(command_exists("python3"), "python3 is available")
         yield CheckResult(command_exists("curl"), "curl is available")
         yield CheckResult(command_exists("git"), "git is available")
-        yield CheckResult(Path(self.settings.grok_bin).is_file(), f"grok binary exists: {self.settings.grok_bin}")
+        yield CheckResult(command_exists(self.settings.grok_bin), f"grok CLI exists: {self.settings.grok_bin}")
         yield CheckResult(command_exists(self.settings.codex_bin), f"codex CLI exists: {self.settings.codex_bin}")
         yield CheckResult((self.settings.home / "config.toml").is_file(), f"groc config exists: {self.settings.home / 'config.toml'}")
         yield CheckResult(self.auth_store.ready(), f"ChatGPT OAuth is ready: {self.settings.auth_file}")

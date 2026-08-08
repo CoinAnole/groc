@@ -65,7 +65,7 @@ def settings_from_env() -> Settings:
         bridge_host=os.environ.get("GROC_BRIDGE_HOST", "127.0.0.1"),
         bridge_port=int(os.environ.get("GROC_BRIDGE_PORT", "11435")),
         bridge_log=Path(os.environ.get("GROC_BRIDGE_LOG", "/tmp/groc-bridge.log")).expanduser(),
-        grok_bin=os.environ.get("GROC_GROK_BIN", str(Path("~/.local/bin/grok").expanduser())),
+        grok_bin=os.environ.get("GROC_GROK_BIN", "grok"),
         default_model=os.environ.get("GROC_MODEL", DEFAULT_MODEL),
         reasoning_effort=os.environ.get("GROC_REASONING_EFFORT", DEFAULT_REASONING_EFFORT),
         auth_home=Path(os.environ.get("GROC_AUTH_HOME", "~/.codex")).expanduser(),

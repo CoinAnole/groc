@@ -360,7 +360,7 @@ GROC_REASONING_EFFORT             defaults to high
 GROC_BRIDGE_HOST                  defaults to 127.0.0.1
 GROC_BRIDGE_PORT                  defaults to 11435
 GROC_BRIDGE_LOG                   defaults to /tmp/groc-bridge.log
-GROC_GROK_BIN                     defaults to ~/.local/bin/grok
+GROC_GROK_BIN                     defaults to grok resolved from PATH
 GROC_AUTH_HOME                    defaults to ~/.codex
 GROC_AUTO_LOGIN                   defaults to 1
 GROC_CODEX_BIN                    defaults to codex

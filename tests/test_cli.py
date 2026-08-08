@@ -98,6 +98,16 @@ class CliTests(unittest.TestCase):
         self.assertIn("brew install codex", hint)
         self.assertIn("@openai/codex", hint)
 
+    def test_grok_dependency_is_resolved_from_path(self) -> None:
+        app_settings = Settings(**{**settings().__dict__, "grok_bin": "grok"})
+        app = GrocApp(app_settings)
+
+        with patch(
+            "groc.cli.command_exists",
+            side_effect=lambda command: command in {"python3", "curl", "git", "grok", "codex"},
+        ):
+            self.assertNotIn("grok", app.missing_dependency_ids())
+
 
 if __name__ == "__main__":
     unittest.main()
