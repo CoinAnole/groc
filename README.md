@@ -5,15 +5,15 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Elon wants $300/month SuperGrok Heavy for early Grok Build access. Groc keeps
-the terminal harness in your workflow with GPT-5.5 and the ChatGPT
+the terminal harness in your workflow with GPT-5.6 Sol and the ChatGPT
 subscription you already pay for.
 If you already use Codex, this is mostly automagic: run `groc` once and it
 boots the local bridge, reuses your ChatGPT auth, and drops you into Grok Build.
 Groc is a local launcher and OpenAI-compatible bridge: one command starts Grok
-Build with `gpt-5.5`, medium reasoning, and your existing Codex ChatGPT OAuth
+Build with `gpt-5.6-sol`, high reasoning, and your existing Codex ChatGPT OAuth
 session.
-If your own coding benchmarks favor GPT-5.5, Groc lets you run that stronger
-model in the same harness flow you already like.
+You can also select GPT-5.6 Terra or Luna, or a supported earlier model, in the
+same harness flow.
 
 Groc does not patch the Grok binary, collect credentials, or ask for an API key.
 It runs on your machine, binds the bridge to `127.0.0.1`, and reuses the OAuth
@@ -160,8 +160,8 @@ groc -p "explain this repo"
 Pick a model:
 
 ```bash
-groc -m gpt-5.4
-groc -m gpt-5.3-spark
+groc -m gpt-5.6-terra
+groc -m gpt-5.6-luna
 ```
 
 Pick reasoning:
@@ -188,27 +188,31 @@ groc update
 
 ## Models
 
-The default model is `gpt-5.5`. The default reasoning effort is `medium`.
-In many engineering teams, internal evals and coding benchmarks can favor
-GPT-5.5 quality for planning, edits, and reliability; Groc is built for that
-path while preserving the Grok Build UX.
+The default model is `gpt-5.6-sol`. The default reasoning effort is `high`.
+OpenAI positions GPT-5.6 Sol as the flagship model for complex reasoning and
+coding ([model guidance](https://developers.openai.com/api/docs/guides/latest-model)).
 
 Configured model IDs:
 
 ```text
+gpt-5.6-sol
+gpt-5.6-terra
+gpt-5.6-luna
 gpt-5.5
 gpt-5.4
 gpt-5.4-mini
-gpt-5.3
-gpt-5.3-spark
 gpt-5.2
 grok-build
 ```
 
-`gpt-5.3` is routed upstream as `gpt-5.3-codex`.
-`gpt-5.3-spark` is routed upstream as `gpt-5.3-codex-spark`.
 `grok-build` is kept as a compatibility fallback for Grok CLI versions that
-make internal requests under that model ID.
+make internal requests under that model ID. It uses `GROC_UPSTREAM_MODEL`,
+which defaults to `gpt-5.6-sol`.
+
+Generated model entries use the current Codex CLI catalog's 272,000-token
+configured context window. Groc 0.2.0 removes the retired `gpt-5.3` and
+`gpt-5.3-spark` entries; update any pinned `GROC_MODEL` value to a configured
+model above.
 
 Check which entries work for your current subscription:
 
@@ -276,8 +280,8 @@ flowchart LR
 Defaults passed to Grok Build:
 
 ```text
-model: gpt-5.5
-reasoning: medium
+model: gpt-5.6-sol
+reasoning: high
 memory: off
 web search: off
 config home: ~/.groc
@@ -351,8 +355,8 @@ GROC_AUTO_LOGIN=0 groc
 
 ```text
 GROC_HOME                         defaults to ~/.groc
-GROC_MODEL                        defaults to gpt-5.5
-GROC_REASONING_EFFORT             defaults to medium
+GROC_MODEL                        defaults to gpt-5.6-sol
+GROC_REASONING_EFFORT             defaults to high
 GROC_BRIDGE_HOST                  defaults to 127.0.0.1
 GROC_BRIDGE_PORT                  defaults to 11435
 GROC_BRIDGE_LOG                   defaults to /tmp/groc-bridge.log
@@ -364,7 +368,7 @@ GROC_CODEX_DEVICE_AUTH            set to 1 to use codex login --device-auth
 GROC_RAW_STDERR                   set to 1 to show unfiltered Grok stderr
 GROC_REPO_URL                     defaults to https://github.com/matrixtsex/groc.git
 GROC_UPDATE_DIR                   defaults to ~/.local/share/groc-src
-GROC_UPSTREAM_MODEL               fallback upstream model, defaults to gpt-5.5
+GROC_UPSTREAM_MODEL               fallback upstream model, defaults to gpt-5.6-sol
 GROC_BACKEND_BASE_URL             dangerous; requires GROC_ALLOW_UNTRUSTED_BACKEND=1
 GROC_REFRESH_TOKEN_URL_OVERRIDE   dangerous; requires GROC_ALLOW_UNTRUSTED_BACKEND=1
 GROC_ALLOW_UNTRUSTED_BACKEND      opt in to endpoint overrides
@@ -384,7 +388,7 @@ the CLI version, and dry-runs model verification.
 Package locally:
 
 ```bash
-scripts/package-release.sh v0.1.0
+scripts/package-release.sh v0.2.0
 ```
 
 ## Project Layout

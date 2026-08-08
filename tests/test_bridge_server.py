@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import io
+import json
 import unittest
 
-from groc.bridge.server import BridgeHandler
+from groc.bridge.server import BridgeHandler, relay_responses_stream
 from groc.errors import BridgeError
 
 
@@ -42,6 +43,26 @@ class BridgeServerTests(unittest.TestCase):
             handler.read_json()
 
         self.assertEqual(raised.exception.status, 400)
+
+    def test_stream_relay_preserves_reasoning_items_in_completed_response(self) -> None:
+        reasoning_item = {"type": "reasoning", "encrypted_content": "encrypted-reasoning"}
+        events = [
+            {"type": "response.output_item.done", "item": reasoning_item},
+            {"type": "response.completed", "response": {"id": "resp_1", "output": []}},
+        ]
+        source = io.BytesIO(
+            b"".join(b"data: " + json.dumps(event).encode("utf-8") + b"\n\n" for event in events)
+        )
+        destination = io.BytesIO()
+
+        relay_responses_stream(source, destination)
+
+        relayed = [
+            json.loads(line.removeprefix(b"data: "))
+            for line in destination.getvalue().splitlines()
+            if line.startswith(b"data: ")
+        ]
+        self.assertEqual(relayed[-1]["response"]["output"], [reasoning_item])
 
 
 if __name__ == "__main__":

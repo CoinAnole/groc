@@ -64,7 +64,8 @@ retries once after a 401 refresh.
 - Keep request/response transformation pure and testable in `groc.bridge.wire`.
 - Keep token parsing and refresh in `groc.auth`.
 - Keep config rendering in `groc.grok_config`.
-- Keep model aliases in `groc.models`.
+- Keep the Codex-aligned model catalog and Grok Build fallback mapping in
+  `groc.models`.
 
 This keeps the product testable without requiring live credentials for most
 changes.

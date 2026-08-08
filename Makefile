@@ -14,7 +14,7 @@ verify:
 	./bin/groc models --check --dry-run
 
 package:
-	scripts/package-release.sh "$${VERSION:-v0.1.0}"
+	scripts/package-release.sh "$${VERSION:-v0.2.0}"
 
 clean:
 	rm -rf dist build *.egg-info .pytest_cache .ruff_cache

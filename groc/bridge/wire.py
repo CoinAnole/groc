@@ -122,6 +122,14 @@ def groc_wire_body(
     if instruction_parts:
         instructions = "\n\n".join([str(instructions), *instruction_parts])
 
+    include: list[Any] = []
+    if isinstance(body.get("include"), list):
+        for item in body["include"]:
+            if item not in include:
+                include.append(item)
+    if "reasoning.encrypted_content" not in include:
+        include.append("reasoning.encrypted_content")
+
     request_body: dict[str, Any] = {
         "model": model,
         "instructions": instructions,
@@ -131,19 +139,23 @@ def groc_wire_body(
         "parallel_tool_calls": body.get("parallel_tool_calls", True),
         "store": bool(body.get("store", False)),
         "stream": bool(body.get("stream", False)),
-        "include": body.get("include") if isinstance(body.get("include"), list) else [],
+        "include": include,
         "client_metadata": body.get("client_metadata")
         if isinstance(body.get("client_metadata"), dict)
         else {"x-groc-installation-id": "groc"},
     }
-    for key in ("service_tier", "prompt_cache_key", "text"):
+    for key in (
+        "service_tier",
+        "prompt_cache_key",
+        "text",
+        "max_output_tokens",
+        "temperature",
+        "top_p",
+    ):
         if key in body:
             request_body[key] = body[key]
     if isinstance(body.get("reasoning"), dict):
-        reasoning = dict(body["reasoning"])
-        if model == "gpt-5.3-codex-spark":
-            reasoning.pop("summary", None)
-        request_body["reasoning"] = reasoning
+        request_body["reasoning"] = dict(body["reasoning"])
     elif "reasoning" in body:
         request_body["reasoning"] = body["reasoning"]
     return request_body
@@ -171,6 +183,7 @@ def extract_output_text(response: dict[str, Any]) -> str:
 def response_from_sse(response: BinaryIO) -> dict[str, Any]:
     completed: dict[str, Any] | None = None
     text_parts: list[str] = []
+    output_items: list[dict[str, Any]] = []
     current_event_lines: list[str] = []
 
     def handle_event(lines: list[str]) -> None:
@@ -188,7 +201,9 @@ def response_from_sse(response: BinaryIO) -> dict[str, Any]:
         if not isinstance(event, dict):
             return
         event_type = event.get("type")
-        if event_type == "response.output_text.delta" and isinstance(event.get("delta"), str):
+        if event_type == "response.output_item.done" and isinstance(event.get("item"), dict):
+            output_items.append(event["item"])
+        elif event_type == "response.output_text.delta" and isinstance(event.get("delta"), str):
             text_parts.append(event["delta"])
         elif event_type == "response.output_text.done" and isinstance(event.get("text"), str):
             text_parts.clear()
@@ -208,5 +223,7 @@ def response_from_sse(response: BinaryIO) -> dict[str, Any]:
 
     if completed is None:
         raise BridgeError("ChatGPT backend stream ended without response.completed", 502)
+    if not completed.get("output"):
+        completed["output"] = output_items
     completed.setdefault("output_text", "".join(text_parts) or extract_output_text(completed))
     return completed

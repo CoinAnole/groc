@@ -9,6 +9,7 @@ from groc.models import DEFAULT_MODEL, DEFAULT_UPSTREAM_MODEL
 
 DEFAULT_BACKEND_BASE_URL = "https://chatgpt.com/backend-api/codex"
 DEFAULT_REFRESH_URL = "https://auth.openai.com/oauth/token"
+DEFAULT_REASONING_EFFORT = "high"
 
 
 @dataclass(frozen=True)
@@ -66,7 +67,7 @@ def settings_from_env() -> Settings:
         bridge_log=Path(os.environ.get("GROC_BRIDGE_LOG", "/tmp/groc-bridge.log")).expanduser(),
         grok_bin=os.environ.get("GROC_GROK_BIN", str(Path("~/.local/bin/grok").expanduser())),
         default_model=os.environ.get("GROC_MODEL", DEFAULT_MODEL),
-        reasoning_effort=os.environ.get("GROC_REASONING_EFFORT", "medium"),
+        reasoning_effort=os.environ.get("GROC_REASONING_EFFORT", DEFAULT_REASONING_EFFORT),
         auth_home=Path(os.environ.get("GROC_AUTH_HOME", "~/.codex")).expanduser(),
         codex_bin=os.environ.get("GROC_CODEX_BIN", "codex"),
         repo_url=os.environ.get("GROC_REPO_URL", "https://github.com/matrixtsex/groc.git"),

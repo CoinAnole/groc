@@ -26,30 +26,54 @@ class WireTests(unittest.TestCase):
             [{"role": "system", "content": "be brief"}, {"role": "user", "content": "hello"}],
         )
 
-    def test_groc_wire_body_routes_aliases_and_removes_spark_summary_reasoning(self) -> None:
+    def test_groc_wire_body_preserves_current_reasoning_fields(self) -> None:
         body = {
-            "model": "gpt-5.3-spark",
+            "model": "gpt-5.6-sol",
             "instructions": "base",
             "input": [
                 {"type": "message", "role": "developer", "content": "internal rules"},
                 {"type": "message", "role": "user", "content": "work"},
             ],
-            "reasoning": {"effort": "medium", "summary": "auto"},
+            "reasoning": {"effort": "high", "summary": "auto", "context": "all_turns"},
         }
 
         converted = groc_wire_body(
             body,
-            default_model="gpt-5.5",
-            upstream_model=lambda model: {"gpt-5.3-spark": "gpt-5.3-codex-spark"}.get(model, model),
+            default_model="gpt-5.6-sol",
+            upstream_model=lambda model: model,
         )
 
-        self.assertEqual(converted["model"], "gpt-5.3-codex-spark")
+        self.assertEqual(converted["model"], "gpt-5.6-sol")
         self.assertEqual(converted["instructions"], "base\n\ninternal rules")
         self.assertEqual(converted["input"], [{"type": "message", "role": "user", "content": [{"type": "input_text", "text": "work"}]}])
-        self.assertEqual(converted["reasoning"], {"effort": "medium"})
+        self.assertEqual(converted["reasoning"], body["reasoning"])
+        self.assertEqual(converted["include"], ["reasoning.encrypted_content"])
+
+    def test_groc_wire_body_forwards_sampling_fields_and_deduplicates_include(self) -> None:
+        body = {
+            "input": "work",
+            "include": ["web_search_call.action.sources", "reasoning.encrypted_content", "web_search_call.action.sources"],
+            "max_output_tokens": 0,
+            "temperature": 0,
+            "top_p": 0,
+        }
+
+        converted = groc_wire_body(body, "gpt-5.6-sol", lambda model: model)
+
+        self.assertEqual(
+            converted["include"],
+            ["web_search_call.action.sources", "reasoning.encrypted_content"],
+        )
+        self.assertEqual(converted["max_output_tokens"], 0)
+        self.assertEqual(converted["temperature"], 0)
+        self.assertEqual(converted["top_p"], 0)
 
     def test_response_from_sse_collects_deltas_until_completion(self) -> None:
         events = [
+            {
+                "type": "response.output_item.done",
+                "item": {"type": "reasoning", "encrypted_content": "encrypted-reasoning"},
+            },
             {"type": "response.output_text.delta", "delta": "gro"},
             {"type": "response.output_text.delta", "delta": "c"},
             {"type": "response.completed", "response": {"id": "resp_1", "output": []}},
@@ -60,6 +84,10 @@ class WireTests(unittest.TestCase):
 
         self.assertEqual(response["id"], "resp_1")
         self.assertEqual(response["output_text"], "groc")
+        self.assertEqual(
+            response["output"],
+            [{"type": "reasoning", "encrypted_content": "encrypted-reasoning"}],
+        )
 
 
 if __name__ == "__main__":

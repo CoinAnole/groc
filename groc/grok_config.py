@@ -17,7 +17,6 @@ def render_grok_config(settings: Settings) -> str:
         "",
         "[subagents]",
         "enabled = true",
-        f"default_model = {toml_string(settings.default_model)}",
         "",
         "[features]",
         "telemetry = false",
@@ -38,7 +37,8 @@ def render_grok_config(settings: Settings) -> str:
                 f"name = {toml_string(model.name + ' (ChatGPT OAuth)')}",
                 'api_key = "local"',
                 'api_backend = "responses"',
-                "context_window = 1000000",
+                f"supports_reasoning_effort = {str(model.supports_reasoning_effort).lower()}",
+                f"context_window = {model.context_window}",
                 "",
             ]
         )

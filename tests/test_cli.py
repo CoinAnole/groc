@@ -19,13 +19,13 @@ def settings() -> Settings:
         bridge_port=11435,
         bridge_log=root / "bridge.log",
         grok_bin="/usr/local/bin/grok",
-        default_model="gpt-5.5",
-        reasoning_effort="medium",
+        default_model="gpt-5.6-sol",
+        reasoning_effort="high",
         auth_home=root / "auth",
         codex_bin="codex",
         repo_url="https://github.com/matrixtsex/groc.git",
         update_dir=root / "src",
-        upstream_model="gpt-5.5",
+        upstream_model="gpt-5.6-sol",
         backend_base_url="https://chatgpt.com/backend-api/codex",
         refresh_url="https://auth.openai.com/oauth/token",
         auto_login=True,
@@ -39,7 +39,10 @@ class CliTests(unittest.TestCase):
     def test_build_grok_command_sets_product_defaults(self) -> None:
         command = build_grok_command(settings(), ["--cwd", "/tmp/project"])
 
-        self.assertEqual(command[:6], ["/usr/local/bin/grok", "-m", "gpt-5.5", "--effort", "medium", "--reasoning-effort"])
+        self.assertEqual(
+            command[:6],
+            ["/usr/local/bin/grok", "-m", "gpt-5.6-sol", "--effort", "high", "--reasoning-effort"],
+        )
         self.assertIn("--no-memory", command)
         self.assertIn("--disable-web-search", command)
         self.assertEqual(command[-2:], ["--cwd", "/tmp/project"])
@@ -64,7 +67,8 @@ class CliTests(unittest.TestCase):
             status = GrocApp(settings()).model_check(dry_run=True)
 
         self.assertEqual(status, 0)
-        self.assertIn("plan gpt-5.5", output.getvalue())
+        self.assertIn("plan gpt-5.6-sol", output.getvalue())
+        self.assertNotIn("plan gpt-5.3", output.getvalue())
         self.assertIn("plan grok-build", output.getvalue())
 
     def test_usage_mentions_doctor_fix(self) -> None:
