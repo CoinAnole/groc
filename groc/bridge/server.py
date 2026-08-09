@@ -72,21 +72,22 @@ def relay_responses_stream(response: BinaryIO, wfile: Any) -> None:
 
 class BridgeHandler(BaseHTTPRequestHandler):
     server_version = "groc-bridge/0.4"
+    server: GrocBridgeServer
 
     @property
     def groc(self) -> GrocResponsesClient:
-        return self.server.groc  # type: ignore[attr-defined]
+        return self.server.groc
 
     @property
     def default_model(self) -> str:
-        return self.server.default_model  # type: ignore[attr-defined]
+        return self.server.default_model
 
     @property
     def upstream_model_name(self) -> str:
-        return self.server.upstream_model_name  # type: ignore[attr-defined]
+        return self.server.upstream_model_name
 
-    def log_message(self, fmt: str, *args: Any) -> None:
-        sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
+    def log_message(self, format: str, *args: Any) -> None:
+        sys.stderr.write("%s - %s\n" % (self.address_string(), format % args))
 
     def read_json(self) -> dict[str, Any]:
         try:
