@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import unittest
+from email.message import Message
 
 from groc.bridge.server import BridgeHandler, relay_responses_stream
 from groc.errors import BridgeError
@@ -11,7 +12,9 @@ from groc.errors import BridgeError
 class BridgeServerTests(unittest.TestCase):
     def handler_with_body(self, body: bytes, content_length: str | None = None) -> BridgeHandler:
         handler = object.__new__(BridgeHandler)
-        handler.headers = {"content-length": str(len(body)) if content_length is None else content_length}
+        headers = Message()
+        headers["content-length"] = str(len(body)) if content_length is None else content_length
+        handler.headers = headers
         handler.rfile = io.BytesIO(body)
         return handler
 

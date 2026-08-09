@@ -20,6 +20,16 @@ make verify
 - Add focused tests for every behavior change.
 - Keep release archives reproducible from tracked files.
 
+### Type checking
+
+Run the type checker locally (not part of `make verify` today):
+
+```bash
+ty check .
+```
+
+Use ty 0.0.65+ if possible; project pins `tool.ty.environment.python-version` to `"3.11"`.
+
 ## Pull Request Checklist
 
 Before opening a PR:
