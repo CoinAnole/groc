@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import urllib.error
 import urllib.request
-from typing import Any, BinaryIO, Callable
+from collections.abc import Callable
+from typing import Any, BinaryIO
 
 from groc.auth import GrocAuthStore
 from groc.bridge.wire import groc_wire_body, response_from_sse

@@ -53,7 +53,7 @@ class GrokConfigTests(unittest.TestCase):
     def test_render_matches_current_grok_and_codex_config_contracts(self) -> None:
         rendered = render_grok_config(settings())
 
-        self.assertIn('[subagents]\nenabled = true\n\n[features]', rendered)
+        self.assertIn("[subagents]\nenabled = true\n\n[features]", rendered)
         self.assertNotIn("default_model =", rendered)
         self.assertNotIn("gpt-5.3", rendered)
         self.assertIn('[model."gpt-5.6-sol"]', rendered)
@@ -65,9 +65,7 @@ class GrokConfigTests(unittest.TestCase):
         self.assertEqual(rendered.count("supports_reasoning_effort = true"), len(MODEL_CATALOG))
 
     def test_install_time_config_matches_runtime_defaults(self) -> None:
-        static_config = (Path(__file__).parents[1] / "config" / "groc.config.toml").read_text(
-            encoding="utf-8"
-        )
+        static_config = (Path(__file__).parents[1] / "config" / "groc.config.toml").read_text(encoding="utf-8")
 
         self.assertIn('default = "gpt-5.6-sol"', static_config)
         self.assertIn('fork_secondary_model = "gpt-5.6-sol"', static_config)
@@ -213,11 +211,11 @@ compact_mode = true
     def test_real_markers_coexist_with_marker_text_inside_multiline_string(self) -> None:
         original = (
             render_grok_config(settings())
-            + "\n[notes]\nmarkers = \"\"\"\n"
+            + '\n[notes]\nmarkers = """\n'
             + BEGIN_MANAGED_MODELS
             + "\n"
             + END_MANAGED_MODELS
-            + '\n\"\"\"\n'
+            + '\n"""\n'
         )
 
         reconciled = reconcile_grok_config(original, settings(port=12003))
@@ -315,9 +313,7 @@ compact_mode = true
             f"values = [\n  {BEGIN_MANAGED_MODELS} extra text\n  1,\n]\n",
         ]
         for malformed in malformed_markers:
-            with self.subTest(
-                marker=malformed.splitlines()[0]
-            ), tempfile.TemporaryDirectory() as directory:
+            with self.subTest(marker=malformed.splitlines()[0]), tempfile.TemporaryDirectory() as directory:
                 config_settings = replace(settings(), home=Path(directory))
                 path = config_settings.home / "config.toml"
                 path.write_text(malformed, encoding="utf-8")
@@ -330,9 +326,7 @@ compact_mode = true
 
     def test_duplicate_and_reversed_exact_markers_are_rejected(self) -> None:
         invalid_markers = {
-            "duplicate": "\n".join(
-                [BEGIN_MANAGED_MODELS, BEGIN_MANAGED_MODELS, END_MANAGED_MODELS, ""]
-            ),
+            "duplicate": "\n".join([BEGIN_MANAGED_MODELS, BEGIN_MANAGED_MODELS, END_MANAGED_MODELS, ""]),
             "reversed": "\n".join([END_MANAGED_MODELS, BEGIN_MANAGED_MODELS, ""]),
         }
         for error, original in invalid_markers.items():

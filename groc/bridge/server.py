@@ -17,13 +17,12 @@ from groc.jsonutil import json_bytes
 from groc.models import MODEL_CATALOG, upstream_model
 from groc.settings import settings_from_env, validate_trusted_endpoints
 
-
 MAX_REQUEST_BYTES = 8 * 1024 * 1024
 
 
 def write_sse_event(wfile: Any, event: dict[str, Any]) -> None:
     if isinstance(event.get("type"), str):
-        wfile.write(f"event: {event['type']}\n".encode("utf-8"))
+        wfile.write(f"event: {event['type']}\n".encode())
     wfile.write(b"data: " + json_bytes(event) + b"\n\n")
     wfile.flush()
 
@@ -87,7 +86,7 @@ class BridgeHandler(BaseHTTPRequestHandler):
         return self.server.upstream_model_name
 
     def log_message(self, format: str, *args: Any) -> None:
-        sys.stderr.write("%s - %s\n" % (self.address_string(), format % args))
+        sys.stderr.write(f"{self.address_string()} - {format % args}\n")
 
     def read_json(self) -> dict[str, Any]:
         try:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import shlex
@@ -9,9 +10,10 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 import groc
 from groc.auth import GrocAuthStore
@@ -19,7 +21,6 @@ from groc.errors import GrocError
 from groc.grok_config import write_grok_config
 from groc.models import MODEL_CATALOG
 from groc.settings import Settings, ensure_launcher_file, settings_from_env, validate_trusted_endpoints
-
 
 NOISE_PATTERNS = (
     'Failed to fetch models: Auth("No auth credentials for cli-chat-proxy")',
@@ -199,10 +200,8 @@ class BridgeProcess:
             time.sleep(0.5)
 
         tail = ""
-        try:
+        with contextlib.suppress(FileNotFoundError):
             tail = "\n".join(self.settings.bridge_log.read_text(encoding="utf-8", errors="replace").splitlines()[-20:])
-        except FileNotFoundError:
-            pass
         message = f"failed to start OAuth bridge at {self.settings.bridge_health_url}"
         if tail:
             message += f"\nbridge log: {self.settings.bridge_log}\n{tail}"
@@ -221,7 +220,7 @@ class BridgeProcess:
             self.log_file.close()
             self.log_file = None
 
-    def __enter__(self) -> "BridgeProcess":
+    def __enter__(self) -> BridgeProcess:
         self.ensure()
         return self
 
@@ -415,8 +414,12 @@ class GrocApp:
         yield CheckResult(command_exists("git"), "git is available")
         yield CheckResult(command_exists(self.settings.grok_bin), f"grok CLI exists: {self.settings.grok_bin}")
         yield CheckResult(command_exists(self.settings.codex_bin), f"codex CLI exists: {self.settings.codex_bin}")
-        yield CheckResult((self.settings.home / "config.toml").is_file(), f"groc config exists: {self.settings.home / 'config.toml'}")
-        yield CheckResult(self.settings.launcher_file.is_file(), f"launcher config exists: {self.settings.launcher_file}")
+        yield CheckResult(
+            (self.settings.home / "config.toml").is_file(), f"groc config exists: {self.settings.home / 'config.toml'}"
+        )
+        yield CheckResult(
+            self.settings.launcher_file.is_file(), f"launcher config exists: {self.settings.launcher_file}"
+        )
         yield CheckResult(self.auth_store.ready(), f"ChatGPT OAuth is ready: {self.settings.auth_file}")
         path_ok = str(Path("~/.local/bin").expanduser()) in os.environ.get("PATH", "").split(os.pathsep)
         yield CheckResult(path_ok, "~/.local/bin is on PATH", warning=True)
@@ -438,7 +441,11 @@ class GrocApp:
         self.ensure_auth()
         with BridgeProcess(self.settings):
             data = read_json(f"{self.settings.api_base_url}/models")
-        models = [item.get("id") for item in data.get("data", []) if isinstance(item, dict) and isinstance(item.get("id"), str)]
+        models = [
+            item.get("id")
+            for item in data.get("data", [])
+            if isinstance(item, dict) and isinstance(item.get("id"), str)
+        ]
         print(f"Default model: {self.settings.default_model}")
         print()
         print("Available models:")

@@ -16,7 +16,6 @@ from groc.errors import BridgeError
 from groc.jsonutil import json_bytes
 from groc.settings import DEFAULT_REFRESH_URL
 
-
 CHATGPT_OAUTH_CLIENT_ID = "app_EMoamEEZ73f0CkXaXp7hrann"
 TOKEN_REFRESH_SKEW_SECONDS = 90
 
@@ -28,7 +27,7 @@ class AuthSummary:
 
 
 def utc_now() -> dt.datetime:
-    return dt.datetime.now(dt.timezone.utc)
+    return dt.datetime.now(dt.UTC)
 
 
 def decode_jwt_payload(jwt: str) -> dict[str, Any]:
@@ -88,7 +87,7 @@ class GrocAuthStore:
             account_text = redact_account(account) if isinstance(account, str) and account else "present"
             exp = decode_jwt_payload(access_token).get("exp")
             if isinstance(exp, (int, float)):
-                expires = dt.datetime.fromtimestamp(exp, dt.timezone.utc).isoformat()
+                expires = dt.datetime.fromtimestamp(exp, dt.UTC).isoformat()
                 return AuthSummary(True, f"ok: account={account_text} access_expires={expires}")
             return AuthSummary(True, f"ok: account={account_text}")
         except BridgeError as exc:

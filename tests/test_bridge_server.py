@@ -53,9 +53,7 @@ class BridgeServerTests(unittest.TestCase):
             {"type": "response.output_item.done", "item": reasoning_item},
             {"type": "response.completed", "response": {"id": "resp_1", "output": []}},
         ]
-        source = io.BytesIO(
-            b"".join(b"data: " + json.dumps(event).encode("utf-8") + b"\n\n" for event in events)
-        )
+        source = io.BytesIO(b"".join(b"data: " + json.dumps(event).encode("utf-8") + b"\n\n" for event in events))
         destination = io.BytesIO()
 
         relay_responses_stream(source, destination)
