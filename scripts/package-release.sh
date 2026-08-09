@@ -25,6 +25,7 @@ cp -R "$repo_root/groc" "$stage/groc"
 cp -R "$repo_root/tests" "$stage/tests"
 cp -R "$repo_root/docs" "$stage/docs"
 cp "$repo_root/config/groc.config.toml" "$stage/config/groc.config.toml"
+cp "$repo_root/config/groc.toml" "$stage/config/groc.toml"
 chmod +x "$stage/install.sh" "$stage/bin/groc" "$stage/bin/groc-bridge" "$stage/bin/install"
 find "$stage" -type d -name __pycache__ -prune -exec rm -rf {} +
 find "$stage" -type f -name "*.pyc" -delete

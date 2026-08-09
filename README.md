@@ -61,7 +61,7 @@ Install these first:
 ```text
 grok
 codex
-python3
+python3.11 or newer
 curl
 git
 ```
@@ -89,11 +89,15 @@ The installer writes:
 ~/.local/bin/groc
 ~/.local/bin/groc-bridge
 ~/.groc/config.toml
+~/.groc/groc.toml
 ~/.local/share/groc/
 ```
 
-Groc regenerates `~/.groc/config.toml` at runtime so environment overrides such
-as `GROC_BRIDGE_PORT` and `GROC_MODEL` stay in sync with Grok Build.
+Grok owns `~/.groc/config.toml`, so settings changed in its UI persist. Groc
+refreshes only the clearly marked model block in that file. Launcher settings
+live in `~/.groc/groc.toml`; environment overrides such as `GROC_BRIDGE_PORT`
+and `GROC_MODEL` take precedence over it. Reinstalling does not overwrite either
+existing file.
 
 Make sure `~/.local/bin` is on your `PATH`:
 
@@ -249,7 +253,7 @@ flowchart LR
   subgraph local["Local machine"]
     U["User runs groc"]
     CLI["Groc CLI (groc/cli.py)"]
-    CFG["Generate ~/.groc/config.toml"]
+    CFG["Reconcile Groc models in ~/.groc/config.toml"]
     AUTH["Read ~/.codex/auth.json"]
     LOGIN["Run codex login when auth is missing"]
     BRIDGE["Local bridge at 127.0.0.1:11435/v1"]
@@ -352,6 +356,15 @@ GROC_AUTO_LOGIN=0 groc
 ```
 
 ## Advanced Settings
+
+Persistent launcher settings can be uncommented in `~/.groc/groc.toml`. Values
+resolve in this order: built-in defaults, then `groc.toml`, then environment
+variables. `GROC_HOME` selects the directory containing both configuration
+files and is therefore environment-only.
+
+Groc continues to pass its model, reasoning, memory, and web-search launch
+overrides on every run. Corresponding Grok UI choices remain saved in
+`config.toml`, but those launch overrides take precedence while Groc is running.
 
 ```text
 GROC_HOME                         defaults to ~/.groc

@@ -18,7 +18,8 @@ repo checkout or local install and then execute the Python package.
 
 - Parse commands.
 - Check or start ChatGPT OAuth login.
-- Render `~/.groc/config.toml` from current runtime settings.
+- Load launcher settings from `~/.groc/groc.toml` with environment overrides.
+- Reconcile only Groc's marked model block in `~/.groc/config.toml`.
 - Start and stop the local bridge.
 - Launch Grok Build with the Groc config home.
 - Run diagnostics, model listing, updates, and model checks.
@@ -47,7 +48,7 @@ retries once after a 401 refresh.
 ## Runtime Flow
 
 1. User runs `groc`.
-2. `groc.cli` loads environment-backed settings.
+2. `groc.cli` loads `~/.groc/groc.toml`, then applies environment overrides.
 3. `groc.auth.GrocAuthStore` checks `~/.codex/auth.json`.
 4. If auth is missing, `codex login` is launched.
 5. `groc.cli.BridgeProcess` starts `groc.bridge.server`.

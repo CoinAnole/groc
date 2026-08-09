@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -86,6 +87,13 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(status, 0)
         doctor_fix.assert_called_once_with(yes=True)
+
+    def test_help_and_version_do_not_require_valid_launcher_config(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "groc.toml").write_text("not valid toml = [", encoding="utf-8")
+            with patch.dict(os.environ, {"GROC_HOME": directory}, clear=True), redirect_stdout(StringIO()):
+                self.assertEqual(main(["--help"]), 0)
+                self.assertEqual(main(["--version"]), 0)
 
     def test_install_hint_for_codex_without_package_tools(self) -> None:
         app = GrocApp(settings())

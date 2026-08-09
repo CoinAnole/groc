@@ -3,7 +3,7 @@ name = "groc"
 version = "0.2.0"
 description = "Local Grok Build launcher backed by a user-controlled ChatGPT OAuth session."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "matrixtsex" }]
 keywords = ["grok", "chatgpt", "oauth", "cli"]
@@ -23,7 +23,7 @@ groc-bridge = "groc.bridge.server:main"
 
 [tool.ruff]
 line-length = 120
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

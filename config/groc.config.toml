@@ -1,5 +1,5 @@
-# Default install-time config. Groc regenerates ~/.groc/config.toml at runtime
-# so environment overrides such as GROC_BRIDGE_PORT stay in sync.
+# Default install-time config. Groc preserves user settings and refreshes only
+# the marked model definitions so bridge overrides stay in sync.
 
 [models]
 default = "gpt-5.6-sol"
@@ -14,6 +14,7 @@ lsp_tools = false
 [memory]
 enabled = false
 
+# BEGIN GROC-MANAGED MODELS
 [model."gpt-5.6-sol"]
 model = "gpt-5.6-sol"
 base_url = "http://127.0.0.1:11435/v1"
@@ -88,6 +89,7 @@ api_backend = "responses"
 supports_reasoning_effort = true
 context_window = 272000
 
+# END GROC-MANAGED MODELS
 [ui]
 max_thoughts_width = 120
 fork_secondary_model = "gpt-5.6-sol"

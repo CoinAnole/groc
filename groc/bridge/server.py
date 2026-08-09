@@ -12,7 +12,7 @@ from typing import Any, BinaryIO
 from groc.auth import GrocAuthStore
 from groc.bridge.client import GrocResponsesClient
 from groc.bridge.wire import extract_output_text, responses_input_from_chat
-from groc.errors import BridgeError
+from groc.errors import BridgeError, GrocError
 from groc.jsonutil import json_bytes
 from groc.models import MODEL_CATALOG, upstream_model
 from groc.settings import settings_from_env, validate_trusted_endpoints
@@ -276,9 +276,12 @@ def create_server(
 
 
 def main(argv: list[str] | None = None) -> int:
-    settings = settings_from_env()
     try:
+        settings = settings_from_env()
         validate_trusted_endpoints(settings)
+    except GrocError as exc:
+        print(f"groc-bridge: {exc}", file=sys.stderr)
+        return exc.status
     except ValueError as exc:
         print(f"groc-bridge: {exc}", file=sys.stderr)
         return 2

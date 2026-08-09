@@ -18,7 +18,7 @@ from groc.auth import GrocAuthStore
 from groc.errors import GrocError
 from groc.grok_config import write_grok_config
 from groc.models import MODEL_CATALOG
-from groc.settings import Settings, settings_from_env, validate_trusted_endpoints
+from groc.settings import Settings, ensure_launcher_file, settings_from_env, validate_trusted_endpoints
 
 
 NOISE_PATTERNS = (
@@ -235,6 +235,7 @@ class GrocApp:
         self.auth_store = GrocAuthStore(settings.auth_home, settings.refresh_url)
 
     def ensure_config(self) -> None:
+        ensure_launcher_file(self.settings)
         write_grok_config(self.settings)
 
     def ensure_auth(self) -> None:
@@ -271,6 +272,7 @@ class GrocApp:
         print(f"Groc {groc.__version__}")
         print(f"home: {self.settings.home}")
         print(f"config: {self.settings.home / 'config.toml'}")
+        print(f"launcher config: {self.settings.launcher_file}")
         print(f"model: {self.settings.default_model}")
         print(f"reasoning: {self.settings.reasoning_effort}")
         print(f"bridge: {self.settings.bridge_base_url}")
@@ -414,6 +416,7 @@ class GrocApp:
         yield CheckResult(command_exists(self.settings.grok_bin), f"grok CLI exists: {self.settings.grok_bin}")
         yield CheckResult(command_exists(self.settings.codex_bin), f"codex CLI exists: {self.settings.codex_bin}")
         yield CheckResult((self.settings.home / "config.toml").is_file(), f"groc config exists: {self.settings.home / 'config.toml'}")
+        yield CheckResult(self.settings.launcher_file.is_file(), f"launcher config exists: {self.settings.launcher_file}")
         yield CheckResult(self.auth_store.ready(), f"ChatGPT OAuth is ready: {self.settings.auth_file}")
         path_ok = str(Path("~/.local/bin").expanduser()) in os.environ.get("PATH", "").split(os.pathsep)
         yield CheckResult(path_ok, "~/.local/bin is on PATH", warning=True)
@@ -511,20 +514,20 @@ class GrocApp:
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    settings = settings_from_env()
-    app = GrocApp(settings)
+    if argv and argv[0] in {"help", "-h", "--help"}:
+        print(usage(), end="")
+        return 0
+    if argv and argv[0] in {"version", "-V", "--version"}:
+        print(f"groc {groc.__version__}")
+        return 0
     try:
+        settings = settings_from_env()
+        app = GrocApp(settings)
         validate_trusted_endpoints(settings)
-        if not argv or argv[0] not in {"help", "-h", "--help", "version", "-V", "--version", "login", "status", "doctor", "update", "models"}:
+        if not argv or argv[0] not in {"login", "status", "doctor", "update", "models"}:
             return app.run_grok(argv)
 
         command = argv.pop(0)
-        if command in {"help", "-h", "--help"}:
-            print(usage(), end="")
-            return 0
-        if command in {"version", "-V", "--version"}:
-            print(f"groc {groc.__version__}")
-            return 0
         if command == "login":
             if argv in ([], ["--browser"]):
                 return app.login(device=False)

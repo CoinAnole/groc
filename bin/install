@@ -3,8 +3,22 @@ set -eu
 
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "groc requires Python 3.11 or newer" >&2
+  exit 1
+fi
+if ! python3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)'; then
+  echo "groc requires Python 3.11 or newer" >&2
+  exit 1
+fi
+
 mkdir -p "$HOME/.groc" "$HOME/.local/bin" "$HOME/.local/share/groc"
-cp "$repo_root/config/groc.config.toml" "$HOME/.groc/config.toml"
+if [ ! -e "$HOME/.groc/config.toml" ] && [ ! -L "$HOME/.groc/config.toml" ]; then
+  cp "$repo_root/config/groc.config.toml" "$HOME/.groc/config.toml"
+fi
+if [ ! -e "$HOME/.groc/groc.toml" ] && [ ! -L "$HOME/.groc/groc.toml" ]; then
+  cp "$repo_root/config/groc.toml" "$HOME/.groc/groc.toml"
+fi
 rm -rf "$HOME/.local/share/groc/groc"
 cp -R "$repo_root/groc" "$HOME/.local/share/groc/groc"
 cp "$repo_root/bin/groc-bridge" "$HOME/.local/bin/groc-bridge"
