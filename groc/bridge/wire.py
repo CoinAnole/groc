@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, BinaryIO, Callable
+from collections.abc import Callable
+from typing import Any, BinaryIO
 
 from groc.errors import BridgeError
 

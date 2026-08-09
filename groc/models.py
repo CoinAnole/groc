@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-
 DEFAULT_MODEL = "gpt-5.6-sol"
 DEFAULT_UPSTREAM_MODEL = "gpt-5.6-sol"
 

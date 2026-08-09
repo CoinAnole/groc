@@ -221,9 +221,7 @@ def _scan_toml_lines(text: str) -> list[_TomlLine]:
 
         comment = body[comment_index:] if kind is _TomlLineKind.COMMENT else None
         header_end = comment_index if comment_index is not None else len(body)
-        table_header = (
-            body[:header_end].rstrip(" \t") if kind is _TomlLineKind.TABLE_HEADER else None
-        )
+        table_header = body[:header_end].rstrip(" \t") if kind is _TomlLineKind.TABLE_HEADER else None
         scanned.append(
             _TomlLine(
                 text=line,
@@ -285,11 +283,7 @@ def _replace_managed_block(
 
 def _parse_table_path(header: str) -> list[str]:
     stripped = header.strip()
-    key_expression = (
-        stripped[2:-2]
-        if stripped.startswith("[[") and stripped.endswith("]]")
-        else stripped[1:-1]
-    )
+    key_expression = stripped[2:-2] if stripped.startswith("[[") and stripped.endswith("]]") else stripped[1:-1]
 
     keys: list[str] = []
     index = 0
@@ -340,9 +334,7 @@ def _migrate_legacy_models(lines: list[_TomlLine], settings: Settings) -> str:
                 skipping_owned_table = True
                 continue
             skipping_owned_table = False
-        if not skipping_owned_table or (
-            line.top_level and line.kind in {_TomlLineKind.BLANK, _TomlLineKind.COMMENT}
-        ):
+        if not skipping_owned_table or (line.top_level and line.kind in {_TomlLineKind.BLANK, _TomlLineKind.COMMENT}):
             preserved.append(line.text)
 
     block = render_managed_models(settings) + "\n"

@@ -45,14 +45,21 @@ class WireTests(unittest.TestCase):
 
         self.assertEqual(converted["model"], "gpt-5.6-sol")
         self.assertEqual(converted["instructions"], "base\n\ninternal rules")
-        self.assertEqual(converted["input"], [{"type": "message", "role": "user", "content": [{"type": "input_text", "text": "work"}]}])
+        self.assertEqual(
+            converted["input"],
+            [{"type": "message", "role": "user", "content": [{"type": "input_text", "text": "work"}]}],
+        )
         self.assertEqual(converted["reasoning"], body["reasoning"])
         self.assertEqual(converted["include"], ["reasoning.encrypted_content"])
 
     def test_groc_wire_body_forwards_sampling_fields_and_deduplicates_include(self) -> None:
         body = {
             "input": "work",
-            "include": ["web_search_call.action.sources", "reasoning.encrypted_content", "web_search_call.action.sources"],
+            "include": [
+                "web_search_call.action.sources",
+                "reasoning.encrypted_content",
+                "web_search_call.action.sources",
+            ],
             "max_output_tokens": 0,
             "temperature": 0,
             "top_p": 0,

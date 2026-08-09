@@ -20,9 +20,7 @@ from groc.settings import (
 
 class SettingsTests(unittest.TestCase):
     def test_defaults_are_local_and_trusted(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.dict(
-            os.environ, {"GROC_HOME": directory}, clear=True
-        ):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"GROC_HOME": directory}, clear=True):
             settings = settings_from_env()
 
         self.assertEqual(settings.bridge_host, "127.0.0.1")
@@ -36,9 +34,7 @@ class SettingsTests(unittest.TestCase):
         validate_trusted_endpoints(settings)
 
     def test_backend_override_requires_explicit_unsafe_opt_in(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.dict(
-            os.environ, {"GROC_HOME": directory}, clear=True
-        ):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"GROC_HOME": directory}, clear=True):
             settings = replace(settings_from_env(), backend_base_url="https://example.invalid")
 
         with self.assertRaises(ValueError):
@@ -47,15 +43,18 @@ class SettingsTests(unittest.TestCase):
         validate_trusted_endpoints(replace(settings, allow_untrusted_backend=True))
 
     def test_model_and_reasoning_defaults_remain_overridable(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.dict(
-            os.environ,
-            {
-                "GROC_HOME": directory,
-                "GROC_MODEL": "gpt-5.6-terra",
-                "GROC_REASONING_EFFORT": "medium",
-                "GROC_UPSTREAM_MODEL": "gpt-5.6-luna",
-            },
-            clear=True,
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            patch.dict(
+                os.environ,
+                {
+                    "GROC_HOME": directory,
+                    "GROC_MODEL": "gpt-5.6-terra",
+                    "GROC_REASONING_EFFORT": "medium",
+                    "GROC_UPSTREAM_MODEL": "gpt-5.6-luna",
+                },
+                clear=True,
+            ),
         ):
             settings = settings_from_env()
 
@@ -64,19 +63,20 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(settings.upstream_model, "gpt-5.6-luna")
 
     def test_grok_binary_remains_overridable(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.dict(
-            os.environ,
-            {"GROC_HOME": directory, "GROC_GROK_BIN": "/opt/grok/bin/grok"},
-            clear=True,
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            patch.dict(
+                os.environ,
+                {"GROC_HOME": directory, "GROC_GROK_BIN": "/opt/grok/bin/grok"},
+                clear=True,
+            ),
         ):
             settings = settings_from_env()
 
         self.assertEqual(settings.grok_bin, "/opt/grok/bin/grok")
 
     def test_refresh_override_requires_explicit_unsafe_opt_in(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.dict(
-            os.environ, {"GROC_HOME": directory}, clear=True
-        ):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"GROC_HOME": directory}, clear=True):
             settings = replace(settings_from_env(), refresh_url="https://example.invalid/oauth/token")
 
         with self.assertRaises(ValueError):
@@ -105,14 +105,17 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(settings.grok_bin, str(home / "bin" / "grok"))
 
     def test_relative_environment_paths_resolve_from_groc_home(self) -> None:
-        with tempfile.TemporaryDirectory() as directory, patch.dict(
-            os.environ,
-            {
-                "GROC_HOME": directory,
-                "GROC_BRIDGE_LOG": "logs/bridge.log",
-                "GROC_GROK_BIN": "bin/grok",
-            },
-            clear=True,
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            patch.dict(
+                os.environ,
+                {
+                    "GROC_HOME": directory,
+                    "GROC_BRIDGE_LOG": "logs/bridge.log",
+                    "GROC_GROK_BIN": "bin/grok",
+                },
+                clear=True,
+            ),
         ):
             settings = settings_from_env()
 
