@@ -3,6 +3,7 @@ from __future__ import annotations
 import tempfile
 import tomllib
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 from groc.errors import GrocError
@@ -83,9 +84,7 @@ class GrokConfigTests(unittest.TestCase):
     def test_write_grok_config_creates_home(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             config_settings = settings()
-            config_settings = Settings(
-                **{**config_settings.__dict__, "home": Path(directory) / "missing" / "home"}
-            )
+            config_settings = replace(config_settings, home=Path(directory) / "missing" / "home")
 
             write_grok_config(config_settings)
 
@@ -93,12 +92,10 @@ class GrokConfigTests(unittest.TestCase):
 
     def test_new_config_escapes_control_characters_and_is_validated(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            config_settings = Settings(
-                **{
-                    **settings().__dict__,
-                    "home": Path(directory),
-                    "default_model": "model\nwith-control-character",
-                }
+            config_settings = replace(
+                settings(),
+                home=Path(directory),
+                default_model="model\nwith-control-character",
             )
 
             write_grok_config(config_settings)
@@ -109,9 +106,7 @@ class GrokConfigTests(unittest.TestCase):
 
     def test_invalid_generated_config_is_not_created(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            config_settings = Settings(
-                **{**settings().__dict__, "home": Path(directory), "default_model": "\ud800"}
-            )
+            config_settings = replace(settings(), home=Path(directory), default_model="\ud800")
 
             with self.assertRaisesRegex(GrocError, "file not created"):
                 write_grok_config(config_settings)
@@ -297,7 +292,7 @@ compact_mode = true
 
     def test_invalid_toml_and_markers_are_rejected_without_writing(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            config_settings = Settings(**{**settings().__dict__, "home": Path(directory)})
+            config_settings = replace(settings(), home=Path(directory))
             path = config_settings.home / "config.toml"
             invalid = "[ui\ncompact_mode = true\n"
             path.write_text(invalid, encoding="utf-8")
@@ -323,7 +318,7 @@ compact_mode = true
             with self.subTest(
                 marker=malformed.splitlines()[0]
             ), tempfile.TemporaryDirectory() as directory:
-                config_settings = Settings(**{**settings().__dict__, "home": Path(directory)})
+                config_settings = replace(settings(), home=Path(directory))
                 path = config_settings.home / "config.toml"
                 path.write_text(malformed, encoding="utf-8")
 
@@ -374,7 +369,7 @@ compact_mode = true
             home.mkdir()
             link = home / "config.toml"
             link.symlink_to(target)
-            config_settings = Settings(**{**settings().__dict__, "home": home, "bridge_port": 12002})
+            config_settings = replace(settings(), home=home, bridge_port=12002)
 
             write_grok_config(config_settings)
 
@@ -383,12 +378,12 @@ compact_mode = true
 
     def test_write_atomically_replaces_config_and_preserves_permissions(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            config_settings = Settings(**{**settings().__dict__, "home": Path(directory)})
+            config_settings = replace(settings(), home=Path(directory))
             path = config_settings.home / "config.toml"
             path.write_text(render_grok_config(settings()), encoding="utf-8")
             path.chmod(0o640)
             original_inode = path.stat().st_ino
-            config_settings = Settings(**{**config_settings.__dict__, "bridge_port": 12005})
+            config_settings = replace(config_settings, bridge_port=12005)
 
             write_grok_config(config_settings)
 

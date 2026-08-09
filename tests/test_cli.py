@@ -4,6 +4,7 @@ import os
 import tempfile
 import unittest
 from contextlib import redirect_stdout
+from dataclasses import replace
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
@@ -107,7 +108,7 @@ class CliTests(unittest.TestCase):
         self.assertIn("@openai/codex", hint)
 
     def test_grok_dependency_is_resolved_from_path(self) -> None:
-        app_settings = Settings(**{**settings().__dict__, "grok_bin": "grok"})
+        app_settings = replace(settings(), grok_bin="grok")
         app = GrocApp(app_settings)
 
         with patch(
