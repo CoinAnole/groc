@@ -1,12 +1,13 @@
 # Groc
 
-[![CI](https://github.com/matrixtsex/groc/actions/workflows/ci.yml/badge.svg)](https://github.com/matrixtsex/groc/actions/workflows/ci.yml)
-[![Release](https://github.com/matrixtsex/groc/actions/workflows/release.yml/badge.svg)](https://github.com/matrixtsex/groc/actions/workflows/release.yml)
+[![CI](https://github.com/CoinAnole/groc/actions/workflows/ci.yml/badge.svg)](https://github.com/CoinAnole/groc/actions/workflows/ci.yml)
+[![Release](https://github.com/CoinAnole/groc/actions/workflows/release.yml/badge.svg)](https://github.com/CoinAnole/groc/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Elon wants $300/month SuperGrok Heavy for early Grok Build access. Groc keeps
-the terminal harness in your workflow with GPT-5.6 Sol and the ChatGPT
-subscription you already pay for.
+Grok Build left early access with a [1.0.0 release](https://x.ai/build/changelog)
+in August 2026. Groc keeps that terminal harness in your workflow with GPT-5.6
+Sol and the ChatGPT subscription you already pay for.
+
 If you already use Codex, this is mostly automagic: run `groc` once and it
 boots the local bridge, reuses your ChatGPT auth, and drops you into Grok Build.
 Groc is a local launcher and OpenAI-compatible bridge: one command starts Grok
@@ -17,13 +18,9 @@ same harness flow.
 
 Groc does not patch the Grok binary, collect credentials, or ask for an API key.
 It runs on your machine, binds the bridge to `127.0.0.1`, and reuses the OAuth
-file created by `codex login`.
-
-Rollout context (as of May 15, 2026): xAI describes Grok Build as an early beta
-for SuperGrok Heavy subscribers in its official launch and CLI pages
-([announcement](https://x.ai/news/grok-build-cli), [CLI page](https://x.ai/cli)).
-The `$300/month` SuperGrok Heavy figure was publicly reported during Grok 4
-launch coverage ([TechCrunch](https://techcrunch.com/2025/07/09/elon-musks-xai-launches-grok-4-alongside-a-300-monthly-subscription/)).
+file created by `codex login`. Groc is independent of xAI subscription tiers —
+it points Grok Build at a local bridge backed by your Codex ChatGPT OAuth
+session ([Grok Build](https://x.ai/build), [launch post](https://x.ai/news/grok-build-cli)).
 
 ## Features
 
@@ -379,7 +376,7 @@ GROC_AUTO_LOGIN                   defaults to 1
 GROC_CODEX_BIN                    defaults to codex
 GROC_CODEX_DEVICE_AUTH            set to 1 to use codex login --device-auth
 GROC_RAW_STDERR                   set to 1 to show unfiltered Grok stderr
-GROC_REPO_URL                     defaults to https://github.com/matrixtsex/groc.git
+GROC_REPO_URL                     defaults to https://github.com/CoinAnole/groc.git
 GROC_UPDATE_DIR                   defaults to ~/.local/share/groc-src
 GROC_UPSTREAM_MODEL               fallback upstream model, defaults to gpt-5.6-sol
 GROC_BACKEND_BASE_URL             dangerous; requires GROC_ALLOW_UNTRUSTED_BACKEND=1

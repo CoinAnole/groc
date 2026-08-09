@@ -30,7 +30,7 @@ def settings(port: int = 11435, model: str = "gpt-5.6-sol") -> Settings:
         reasoning_effort="high",
         auth_home=root / "auth",
         codex_bin="codex",
-        repo_url="https://github.com/matrixtsex/groc.git",
+        repo_url="https://github.com/CoinAnole/groc.git",
         update_dir=root / "src",
         upstream_model="gpt-5.6-sol",
         backend_base_url="https://chatgpt.com/backend-api/codex",

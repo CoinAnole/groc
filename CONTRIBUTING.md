@@ -5,7 +5,7 @@ Groc is intentionally small. Keep changes boring, explicit, and easy to audit.
 ## Local Setup
 
 ```bash
-git clone https://github.com/matrixtsex/groc.git
+git clone https://github.com/CoinAnole/groc.git
 cd groc
 make verify
 ```

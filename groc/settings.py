@@ -24,7 +24,7 @@ LAUNCHER_CONFIG_TEMPLATE = """# Groc launcher settings. Uncomment only values yo
 # reasoning_effort = "high"
 # auth_home = "~/.codex"
 # codex_bin = "codex"
-# repo_url = "https://github.com/matrixtsex/groc.git"
+# repo_url = "https://github.com/CoinAnole/groc.git"
 # update_dir = "~/.local/share/groc-src"
 # upstream_model = "gpt-5.6-sol"
 # backend_base_url = "https://chatgpt.com/backend-api/codex"
@@ -87,7 +87,7 @@ DEFAULT_VALUES: dict[str, Any] = {
     "reasoning_effort": DEFAULT_REASONING_EFFORT,
     "auth_home": "~/.codex",
     "codex_bin": "codex",
-    "repo_url": "https://github.com/matrixtsex/groc.git",
+    "repo_url": "https://github.com/CoinAnole/groc.git",
     "update_dir": "~/.local/share/groc-src",
     "upstream_model": DEFAULT_UPSTREAM_MODEL,
     "backend_base_url": DEFAULT_BACKEND_BASE_URL,
